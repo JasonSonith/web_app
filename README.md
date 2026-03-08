@@ -70,10 +70,53 @@ web_app/
 │       └── app.js          # Frontend logic
 ├── test/
 │   └── test_api.http       # API test requests
+├── system-design/          # Architecture & flow diagrams
+│   ├── sercure-notes-architecture.svg
+│   ├── data-model.svg
+│   ├── login-flow.svg
+│   ├── registration.svg
+│   ├── auth-request.png
+│   └── token lifecycle.png
 ├── docs/                   # Documentation
 ├── CLAUDE.md               # Development instructions
 └── README.md
 ```
+
+## System Design
+
+Diagrams are in the [`system-design/`](system-design/) directory.
+
+### Architecture
+
+Three-tier design: **Client** (HTML/CSS/JS) → **Server** (Flask/Python) → **Database** (SQLite).
+
+The client serves static files through Flask. The server layer handles routing, input validation, JWT auth middleware, bcrypt password hashing, rate limiting, and security headers. All data is stored in `securenotes.db`.
+
+### Data Model
+
+| users | | notes |
+|-------|---|-------|
+| **PK** id (INT) | 1:N | **PK** id (INT) |
+| username (UNIQUE) | → | user_id (FK → users) |
+| password_hash (NOT NULL) | | title (TEXT) |
+| created_at (TIMESTAMP) | | content (TEXT) |
+| | | created_at (TIMESTAMP) |
+
+### Authentication Flows
+
+**Registration:** Client sends username/password → server validates input → checks password against HIBP breach API → hashes with bcrypt → inserts into users table → responds `201 Created` or `409/400` error.
+
+**Login:** Client sends username/password → server looks up user by username → verifies password with `bcrypt.checkpw()` → generates JWT with `jwt.encode()` → responds `200` with token or `401` error.
+
+**Authenticated requests:** Client sends request with `Authorization: Bearer <token>` → server decodes JWT, validates signature and expiry → extracts `user_id` → queries only that user's data → responds with results.
+
+### Token Lifecycle
+
+1. Issued on login with 2-hour expiration
+2. Stored in a JS variable (memory only — not localStorage or cookies)
+3. Sent as Bearer token on every API request
+4. Server validates signature + expiry on each request
+5. Tampered or expired tokens receive `401`
 
 ## API Reference
 

@@ -17,6 +17,15 @@ web_app/
 ├── test/
 │   └── test_api.http       # REST Client API tests
 ├── docs/                   # Project documentation
+├── system-design/          # Architecture & flow diagrams
+│   ├── sercure-notes-architecture.svg  # System architecture
+│   ├── data-model.svg      # Database ER diagram
+│   ├── login-flow.svg      # Login sequence diagram
+│   ├── registration.svg    # Registration sequence diagram
+│   ├── auth-request.png    # Authenticated request flow
+│   ├── token lifecycle.png # JWT token lifecycle
+│   └── src/
+│       └── data-model.drawio  # Editable data model source
 └── securenotes.db          # SQLite database (auto-created)
 ```
 
@@ -54,6 +63,66 @@ nikto -h http://localhost:5000
 | GET | /api/notes | Yes | List user's notes |
 | POST | /api/notes | Yes | Create new note |
 | DELETE | /api/notes/:id | Yes | Delete a note |
+
+## System Design
+
+### Architecture
+Three-tier architecture: Client (HTML/CSS/JS) → Server (Flask/Python) → Database (SQLite).
+- **Client** serves `index.html`, `style.css`, `app.js` from Flask's static folder
+- **Server** handles route handlers, input validation, auth middleware (JWT), password hashing (bcrypt), rate limiting, and security headers
+- **Database** is `securenotes.db` (SQLite), auto-created on first run
+
+### Data Model
+Two tables with a 1:N relationship (one user has many notes):
+
+**users**
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | INT | PRIMARY KEY |
+| username | TEXT | UNIQUE |
+| password_hash | TEXT | NOT NULL |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
+
+**notes**
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | INT | PRIMARY KEY |
+| user_id | INT | FOREIGN KEY → users.id |
+| title | TEXT | |
+| content | TEXT | |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
+
+### Registration Flow
+1. Client sends `POST /api/register` with `{username, password}`
+2. Server validates input
+3. Server checks password against HIBP breach API
+4. Server hashes password with `bcrypt.hashpw()`
+5. Server inserts new row into users table
+6. Database returns success or integrity error (duplicate username)
+7. Server responds `201 Created` or `409/400` error
+
+### Login Flow
+1. Client sends `POST /api/login` with `{username, password}`
+2. Server queries `SELECT user WHERE username = ?`
+3. Database returns user row or None
+4. Server runs `bcrypt.checkpw()` to verify password
+5. Server generates token with `jwt.encode()`
+6. Server responds `200` with token or `401` error
+
+### Authenticated Request Flow
+1. Client sends `GET /api/notes` with `Authorization: Bearer JWT`
+2. Server calls `jwt.decode(token)` to validate signature and expiry
+3. Server extracts `user_id` from decoded token
+4. Server queries `SELECT notes WHERE user_id = ?`
+5. Database returns matching notes rows
+6. Server responds `200` with notes array
+
+### Token Lifecycle
+1. Token issued on login with 2-hour expiration
+2. Stored in JS variable (memory only — not localStorage/cookies)
+3. Sent as Bearer token in Authorization header on every API request
+4. Server validates signature + expiry on each request
+5. Valid token → request proceeds; tampered/expired token → `401 Signature Mismatch`
 
 ## Security Principles
 
