@@ -215,10 +215,10 @@ Create `~/securenotes/static/index.html`:
 4. **Add an "About" section** below the footer.
 
 ### Checkpoint
-- [ ] You can explain the difference between `id` and `class`
-- [ ] You understand what `<form>`, `<input>`, `<label>`, and `<button>` do
-- [ ] You know why `method="POST"` is preferred over `method="GET"` for login forms
-- [ ] You can use browser DevTools to inspect the DOM tree
+- [x] You can explain the difference between `id` and `class`
+- [x] You understand what `<form>`, `<input>`, `<label>`, and `<button>` do
+- [x] You know why `method="POST"` is preferred over `method="GET"` for login forms
+- [x] You can use browser DevTools to inspect the DOM tree
 
 ---
 
