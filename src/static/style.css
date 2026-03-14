@@ -27,3 +27,186 @@ body {
     flex-direction: column;
     align-items: center;
 }
+
+header {
+    text-align:center;
+    padding: 3rem 1rem 1rem;
+}
+
+header h1 {
+    font-size: 2rem;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+}
+
+header p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+main {
+    width: 100%;
+    max-width: 480px;
+    padding: 1.5rem;
+}
+
+nav {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+nav button {
+    flex: 1;
+    padding: 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+    font-size: .95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Active is for when pressing down on the element */
+nav button.active {
+    background: var(--accent);
+    color: var(--bg-primary);
+    border-color: var(--accent);
+    font-weight: 600;
+}
+
+nav button:hover:not(.active) {
+    border-color: var(--accent);
+    color: var(--text-primary);
+}
+
+#errorMsg {
+    color: var(--danger);
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    min-height: 1.2rem;
+}
+
+section > div {
+    margin-bottom: 1rem;
+}
+
+/* Labels like "Username", "Password", etc. */
+label {
+    display: block;
+    margin-bottom: 0.4rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+}
+
+/* input when the text boxes are actively selected */
+input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+input::placeholder, textarea::placeholder {
+    color: var(--bg-tertiary);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Edits any button that is a childitem of section or any button with the id "saveNoteBtn" */
+section > button, #saveNoteBtn {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: var(--bg-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+    margin-top: 0.5rem;
+}
+
+/* Edits childitem buttons of section when you hover over them
+or a button with id of saveNoteBtn when you hover over them */
+section > button:hover, #saveNoteBtn:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+}
+
+section > button:active, #saveNoteBtn:active {
+    transform: translateY(0); /* Transforms button back to original position*/
+}
+
+#noteList {
+    margin-top: 2rem;
+}
+
+.note-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border); /*1px thickness, continuous line style, and border color from root*/
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+    transition: border-color 0.2s ease;
+}
+
+.note-card:hover {
+    border-color: var(--accent);
+}
+
+.note-card h3 {
+    color: var(--accent);
+    font-size: 1rem;
+    margin-bottom: 0.4rem;
+}
+
+.note-card p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.note-card .note-date {
+    color: var(--bg-tertiary);
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+footer {
+    text-align: center;
+    padding: 2rem 1rem; /*top and bottom = 2rem (32px), left and right = 1rem (16px)*/
+    color: var(--bg-tertiary);
+    font-size: 0.8rem;
+    margin-top: auto;
+}
+
+/* When a hidden class is added, it does not display on the page
+no matter what because of "!important" */
+.hidden {
+    display: none !important;
+}
+
+/* Makes padding of main 1rem or header h1 fontsize 1.5rem
+if max width of media is the size of a phone */
+@media (max-width: 520px) {
+    main {padding: 1rem;}
+    header h1 {font-size: 1.5rem;}
+}
