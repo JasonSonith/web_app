@@ -74,4 +74,46 @@ async function handleLogin() {
     const password = document.getElementById('regPass').value;
 
     const userErr = validateUsername(username);
+    if (userErr) return showError(userErr);
+    const passErr = validatePassword(password);
+    if (passErr) return showError(passErr);
+
+    try {
+        const res = await fetch ('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({username, password})
+        });
+    
+        const data = await res.json();
+        // ^takes the raw response from the server and parses it from JSON into a JavaScript object you can work with. So if the server sent back {"token":"abc123"}, now data.token equals "abc123"
+
+        if (res.ok) {
+            authToken = data.token;
+            showDashboard();
+            loadNotes();
+        }
+
+        else {
+            showError(data.error || 'Login failed');
+        }
+    }
+    catch (err) {
+        showError ('Could not connect to server');
+    }
+}
+
+async function handleRegister() {
+    clearError();
+    const username = document.getElementById('regUser').value.trim();
+    const password = document.getElementById('regPass').value;
+    const confirm = document.getElementById('regPassConfirm').value;
+
+    const userErr = validateUsername(username);
+    if (userErr) return showError(userErr);
+    const passErr = validatePassword(password);
+    if (passErr) return showError(passErr);
+    if (password !== confirm) {
+        return ShowError('Passwords do not match');
+    }
 }
