@@ -433,11 +433,11 @@ footer {
 4. **Break the layout:** Set `main` to `max-width: 200px` and see how the form handles cramped space. Fix it with responsive adjustments.
 
 ### Checkpoint
-- [ ] You can explain the CSS box model (content → padding → border → margin)
-- [ ] You understand flexbox enough to center elements and create rows/columns
-- [ ] You know what specificity is and why `#id` overrides `.class`
-- [ ] You can use CSS variables and understand why they're useful
-- [ ] Your login page looks styled and professional in the browser
+- [x] You can explain the CSS box model (content → padding → border → margin)
+- [x] You understand flexbox enough to center elements and create rows/columns
+- [x] You know what specificity is and why `#id` overrides `.class`
+- [x] You can use CSS variables and understand why they're useful
+- [x] Your login page looks styled and professional in the browser
 
 ---
 
