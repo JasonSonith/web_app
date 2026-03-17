@@ -116,4 +116,45 @@ async function handleRegister() {
     if (password !== confirm) {
         return ShowError('Passwords do not match');
     }
+
+    try {
+        const res = await fetch('/api/register', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username, password})
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+            switchTab('login');
+            document.getElementById('loginUser').value = username;
+            document.getElementById('loginPass').focus();
+        }
+
+        else {
+            showError(data.error || 'Registration failed.')
+        }
+    }
+
+    catch (err) {
+        showError('Could nto connect to server');
+    }
+}
+
+//Dashboard UI
+function showDashboard() {
+    loginForm.hidden = true;
+    registerForm.hidden = true;
+    document.querySelector('nav').hidden = true;
+    notesSection.hidden = false;
+    clearError();
+}
+
+function showAuth() {
+    loginForm.hidden = false;
+    registerForm.hidden = true;
+    document.querySelector('nav').hidden = false;
+    notesSection.hidden = true;
+    authToken = null;
+    switchTab('login');
 }
