@@ -12,7 +12,7 @@ const notesList = document.getElementById('notesList');
 
 //Tab Switching
 loginTab.addEventListener('click', () => switchTab('login'));
-registerTab = addEventListener('click', () => switchTab('register'));
+registerTab.addEventListener('click', () => switchTab('register'));
 
 function switchTab(tab) {
     errorMsg.textContent = '';
@@ -71,7 +71,7 @@ document.getElementById('loginPass').addEventListener('keypress', (e) => { //han
 async function handleLogin() {
     clearError();
     const username = document.getElementById('loginUser').value.trim();
-    const password = document.getElementById('regPass').value;
+    const password = document.getElementById('loginPass').value;
 
     const userErr = validateUsername(username);
     if (userErr) return showError(userErr);
@@ -114,7 +114,7 @@ async function handleRegister() {
     const passErr = validatePassword(password);
     if (passErr) return showError(passErr);
     if (password !== confirm) {
-        return ShowError('Passwords do not match');
+        return showError('Passwords do not match');
     }
 
     try {
@@ -137,7 +137,7 @@ async function handleRegister() {
     }
 
     catch (err) {
-        showError('Could nto connect to server');
+        showError('Could not connect to server');
     }
 }
 
@@ -157,4 +157,134 @@ function showAuth() {
     notesSection.hidden = true;
     authToken = null;
     switchTab('login');
+}
+
+//CRUD for notes
+document.getElementById('saveNoteBtn').addEventListener('click', handleSaveNote);
+
+async function handleSaveNote() {
+    const title = document.getElementById('noteTitle').value.trim();
+    const content = document.getElementById('noteContent').value.trim();
+
+    if (!title || !content) {
+        return showError('Title and content are required');
+    }
+
+    try {
+        const res = await fetch(
+            '/api/notes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({title, content})
+            }
+        );
+
+        if (res.ok) {
+            document.getElementById('noteTitle').value = '';
+            document.getElementById('noteContent').value = '';
+            clearError();
+            loadNotes();
+        }
+
+        else if (res.status === 401) {
+            showError('Session expired. Please login again.');
+        }
+
+        else {
+            const data = await res.json();
+            showError (data.error || 'Failed to save note');
+        }
+    }
+
+    catch (err) {
+            showError('Could not connect to server');
+        }
+}
+
+async function loadNotes() {
+    try {
+        const res = await fetch('/api/notes', {
+            headers: {'Authorization': `Bearer ${authToken}`}
+        });
+
+        if (res.status === 401) {
+            showAuth();
+            return;
+        }
+
+        const notes = await res.json();
+        renderNotes(notes);
+    }
+
+    catch (err) {
+        showError('Could not load notes');
+    }
+}
+
+function renderNotes(notes) {
+    noteList.innerHTML = '';
+
+    if (notes.length === 0) {
+        const empty = document.createElement('p');
+        empty.textContent = 'No notes yet. Create your first one above!';
+        empty.style.color = 'var(--text-muted)';
+        empty.style.textAlign = 'center';
+        empty.style.marginTop = '2rem';
+        noteList.appendChild(empty);
+        return;
+    }
+
+    notes.forEach(note => {
+        const card = document.createElement('div');
+        card.className = 'note-card';
+        const h3 = document.createElement('h3');
+        h3.textContent = note.title;
+        const p = document.createElement('p');
+        p.textContent = note.content;
+        const date = document.createElement('span');
+        date.className = 'note-date';
+        date.textContent = new Date(note.created_at).toLocaleString();
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.addEventListener('click', () => deleteNote(note.id));
+        card.appendChild(h3);
+        card.appendChild(p);
+        card.appendChild(date);
+        card.appendChild(deleteBtn);
+        notesList.appendChild(card);
+    });
+}
+
+async function deleteNote(noteId) {
+
+    try {
+        const res = await fetch (`/api/notes/${noteId}`, {
+            method : 'DELETE',
+            headers: {'Authorization': `Bearer ${authToken}`}
+        }
+        );
+
+        if (res.ok) {
+            loadNotes();
+        }
+
+        else if (res.status === 401) {
+            showError('Session expired. Please login again');
+            showAuth();
+        }
+    }
+
+    catch (err) {
+        showError('Could not connect to server');
+    }
+}
+
+document.getElementById('noteContent').addEventListener('input', updateCharCount);
+
+function updateCharCount() {
+    const length = document.getElementById('noteContent').value.length;
+    document.getElementById('charCounter').textContent = `${length} / 1000`;
 }

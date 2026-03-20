@@ -3,69 +3,70 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width", initial-scale="1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>SecureNotes</title>
-        <link rel="stylesheet" href="style.css"></link>
+        <link rel="stylesheet" href="style.css">
     </head>
     <body>
         <header>
             <h1>SecureNotes</h1>
             <p>Your private, encrypted notebook.</p>
+        </header>
 
-            <main>
-                <!--navigation form for login/registration page-->
-                <nav>
-                    <button id="LoginTab" class="active">Login</button>
-                    <button id="registerTab">Register</button>
-                </nav>
+        <main>
+            <!--navigation form for login/registration page-->
+            <nav>
+                <button id="loginTab" class="active">Login</button>
+                <button id="registerTab">Register</button>
+            </nav>
 
-                <div id="errorMsg"></div>
+            <div id="errorMsg"></div>
 
-                <!--section for creating the login form-->
-                <section id="loginForm">
-                    <h2>Login</h2>
+            <!--section for creating the login form-->
+            <section id="loginForm">
+                <h2>Login</h2>
 
-                    <div>
-                        <label for="loginUser">Username</label>
-                        <input type="text" id="loginUser" placeholder="Enter username"
-                            required minlength="3" maxlength="30">
-                    </div>
+                <div>
+                    <label for="loginUser">Username</label>
+                    <input type="text" id="loginUser" placeholder="Enter username"
+                        required minlength="3" maxlength="30">
+                </div>
 
-                    <div>
-                        <label for="loginPass">Password</label>
-                        <input type="password" id="loginPass" placeholder="Enter password" required minlength="8">
-                    </div>
-                    <button id="loginBtn">Login</button>
-                    <a href="http://google.com">Forgot Password</a>
-                </section>
-                <!------------------------------------------------->
+                <div>
+                    <label for="loginPass">Password</label>
+                    <input type="password" id="loginPass" placeholder="Enter password" required minlength="8">
+                </div>
+                <button id="loginBtn">Login</button>
+                <a href="http://google.com">Forgot Password</a>
+            </section>
+            <!------------------------------------------------->
 
-                <!--Section for registration or creating a new account-->
-                <section id="registerForm">
-                    <h2>Create Account</h2>
+            <!--Section for registration or creating a new account-->
+            <section id="registerForm" hidden>
+                <h2>Create Account</h2>
 
-                    <div>
-                        <label for="regUser">Username</label>
-                        <input type="text" id="regUser" placeholder="Choose username" required minlength="3"
-                            maxlength="30">
-                    </div>
+                <div>
+                    <label for="regUser">Username</label>
+                    <input type="text" id="regUser" placeholder="Choose username" required minlength="3"
+                        maxlength="30">
+                </div>
 
-                    <div>
-                        <label for="regPass">Password</label>
-                        <input type="text" id="regPass" placeholder="Choose password" required minlength="8">
-                    </div>
+                <div>
+                    <label for="regPass">Password</label>
+                    <input type="password" id="regPass" placeholder="Choose password" required minlength="8">
+                </div>
 
-                    <div>
-                        <label for="regPassConfirm">Confirm Password</label>
-                        <input type="text" id="regPassConfirm" placeholder = "Confirm Password"
-                            required minlength="8">
-                    </div>
-                    <button id="RegisterBtn">Create Account</button>
-                </section>
-                <!------------------------------------------------->
+                <div>
+                    <label for="regPassConfirm">Confirm Password</label>
+                    <input type="password" id="regPassConfirm" placeholder="Confirm Password"
+                        required minlength="8">
+                </div>
+                <button id="registerBtn">Create Account</button>
+            </section>
+            <!------------------------------------------------->
 
-                <!--Section for the actual notes-->
-                <section id="notesSection">
+            <!--Section for the actual notes-->
+            <section id="notesSection" hidden>
                 <h2>My Notes</h2>
 
                 <div>
@@ -75,30 +76,30 @@
 
                 <div>
                     <label for="noteContent">Content</label>
-                    <textarea type="text" id="noteContent" placeholder="Write your note..."></textarea>
+                    <textarea id="noteContent" rows="5" placeholder="Write your note..."></textarea>
+                    <span id="charCounter" class="note-date">0 / 10000</span>
                 </div>
 
                 <button id="saveNoteBtn">Save Note</button>
 
                 <!--This is for future javascript use to create more notes inside the div-->
-                <div id="noteList"></div>
-                </section>
-                <!------------------------------------------------->
-            </main>
-
-            <!--Footer at the bottom of the page-->
-            <footer>
-                <p>SecureNotes &copy; 2026 - Built for proof of concept web security!</p>
-            </footer>
-
-            <section id="about">
-                <h2>About</h2>
-                <div>
-                    <p>This is a note taking application.</p>
-                </div>
+                <div id="notesList"></div>
             </section>
+            <!------------------------------------------------->
+        </main>
 
-        </header>
+        <!--Footer at the bottom of the page-->
+        <footer>
+            <p>SecureNotes &copy; 2026 - Built for proof of concept web security!</p>
+        </footer>
+
+        <section id="about">
+            <h2>About</h2>
+            <div>
+                <p>This is a note taking application.</p>
+            </div>
+        </section>
+
         <!--Loading html script after all HTML renders-->
         <script src="app.js"></script>
     </body>
