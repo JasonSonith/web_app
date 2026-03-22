@@ -241,7 +241,7 @@ function renderNotes(notes) {
         const card = document.createElement('div');
         card.className = 'note-card';
         const h3 = document.createElement('h3');
-        h3.textContent = note.title;
+        h3.innerHTML = note.title;
         const p = document.createElement('p');
         p.textContent = note.content;
         const date = document.createElement('span');
@@ -287,4 +287,13 @@ document.getElementById('noteContent').addEventListener('input', updateCharCount
 function updateCharCount() {
     const length = document.getElementById('noteContent').value.length;
     document.getElementById('charCounter').textContent = `${length} / 1000`;
+}
+
+const logoutBtn = document.createElement('button');
+logoutBtn.textContent = 'Logout';
+logoutBtn.addEventListener('click',logout)
+document.getElementById('notesSection').appendChild(logoutBtn);
+
+function logout() {
+    showAuth();
 }
