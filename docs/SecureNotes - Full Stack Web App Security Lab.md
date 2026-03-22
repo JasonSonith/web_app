@@ -731,10 +731,10 @@ function renderNotes(notes) {
 5. **Open the Network tab** in DevTools and watch the fetch requests. Look at request headers, body, and response.
 
 ### Checkpoint
-- [ ] You can explain `textContent` vs `innerHTML` and why it matters for security
-- [ ] You understand `async/await` and how `fetch()` talks to the backend
-- [ ] You can use event listeners for clicks and keyboard input
-- [ ] You can read the Network tab in DevTools
+- [x] You can explain `textContent` vs `innerHTML` and why it matters for security
+- [x] You understand `async/await` and how `fetch()` talks to the backend
+- [x] You can use event listeners for clicks and keyboard input
+- [x] You can read the Network tab in DevTools
 
 ---
 
