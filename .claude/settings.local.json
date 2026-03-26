@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__MCP_DOCKER__obsidian_list_files_in_vault"
+    ]
+  }
+}
