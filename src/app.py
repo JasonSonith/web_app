@@ -6,3 +6,12 @@ import datetime
 import os
 import re
 
+app = Flask(__name__, static_folder ='static')
+SECRET_KEY = os.environ.get('JWT_SECRET', os.urandom(32).hex())
+DATABASE = 'securenotes.db'
+
+'''
+Database Helpers
+'''
+
+
