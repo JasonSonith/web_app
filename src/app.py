@@ -64,3 +64,12 @@ def validate_username(username):
         return 'Username: letters, numbers, underscores only'
     return None
 
+
+## Server frontend
+@app.route('/')
+def index():
+    return send_from_directory('static', 'index.html')
+
+@app.route('/<path:filename>')
+def static_files(filename):
+    return send_from_directory('static', filename)
