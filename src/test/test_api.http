@@ -1,0 +1,17 @@
+### Register a new user
+POST http://localhost:5000/api/register
+Content-Type: application/json
+
+{ "username": "testuser", "password": "securepass123" }
+
+### Register with SQL injection attempt (should fail safely)
+POST http://localhost:5000/api/register
+Content-Type: application/json
+
+{ "username": "' OR 1=1 --", "password": "123"}
+
+### Register with weak password(should fail)
+POST http://localhost:5000/api/register
+Content-Type: application/json
+
+{ "username": "baduser", "password": "123"}

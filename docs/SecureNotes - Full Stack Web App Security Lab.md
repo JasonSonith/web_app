@@ -1012,10 +1012,10 @@ Visit `http://localhost:5000` — the full app should work.
 5. **Verify every SQL query** uses parameterized `?` placeholders, never string concatenation.
 
 ### Checkpoint
-- [ ] Your app runs — register, login, create notes, view them
-- [ ] You understand the full request/response cycle (client → server → database → client)
-- [ ] You know why server-side validation matters even with client-side validation
-- [ ] You can explain what a JWT is and how it proves authentication
+- [x] Your app runs — register, login, create notes, view them
+- [x] You understand the full request/response cycle (client → server → database → client)
+- [x] You know why server-side validation matters even with client-side validation
+- [x] You can explain what a JWT is and how it proves authentication
 
 ---
 

@@ -244,6 +244,28 @@ def update_note(id):
     conn.close()
     return jsonify({'message': 'Note updated'}), 201
 
+@app.route('/api/profile')
+def get_profile():
+    user_id = get_current_user()
+    
+    if not user_id:
+        return jsonify({'error': 'Profile not found'}), 401
+        
+    conn = get_db()
+    user = conn.execute(
+        'SELECT username, created_at FROM users WHERE user_id = ?',
+        (user_id,)
+    ).fetchone()
+    conn.close()
+    
+    if user is None:
+        return jsonify({'error': 'User not found'}), 404
+    
+    return jsonify({
+    'username': user['username'],
+    'created_at': user['created_at']
+}), 200
+
 # =========================
 # Start
 # =========================
