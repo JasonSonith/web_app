@@ -225,7 +225,7 @@ async function loadNotes() {
 }
 
 function renderNotes(notes) {
-    noteList.innerHTML = '';
+    notesList.innerHTML = '';
 
     if (notes.length === 0) {
         const empty = document.createElement('p');
@@ -233,7 +233,7 @@ function renderNotes(notes) {
         empty.style.color = 'var(--text-muted)';
         empty.style.textAlign = 'center';
         empty.style.marginTop = '2rem';
-        noteList.appendChild(empty);
+        notesList.appendChild(empty);
         return;
     }
 
