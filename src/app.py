@@ -5,6 +5,8 @@ import jwt
 import datetime
 import os
 import re
+import hashlib
+import requests as http_requests
 
 app = Flask(__name__, static_folder='static')
 SECRET_KEY = os.environ.get('JWT_SECRET', os.urandom(32).hex())
@@ -100,6 +102,13 @@ def register():
     pass_err = validate_password(password)
     if pass_err:
         return jsonify({'error': pass_err}), 400
+    
+    breach_count = check_password_breach(password)
+    
+    if breach_count > 0:
+        return jsonify({
+            'error': f'Password found in {breach_count} data breaches. Choose a different one'
+        }), 400
 
     password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
@@ -215,8 +224,8 @@ def delete_note(note_id):
         return jsonify({'message': 'Note deleted'}), 200
     return jsonify({'error': 'Note not found'}), 404
 
-@app.route('/api/notes/id', methods=['PUT'])
-def update_note(id):
+@app.route('/api/notes/<int:note_id>', methods=['PUT'])
+def update_note(note_id):
     user_id = get_current_user()
     
     if not user_id:
@@ -234,7 +243,7 @@ def update_note(id):
     conn = get_db()
     cursor = conn.execute(
         'UPDATE notes SET title = ?, content = ? WHERE id = ? AND user_id = ?',
-        (title, content, id, user_id)
+        (title, content, note_id, user_id)
     )
     conn.commit()
     if cursor.rowcount == 0:
@@ -253,7 +262,7 @@ def get_profile():
         
     conn = get_db()
     user = conn.execute(
-        'SELECT username, created_at FROM users WHERE user_id = ?',
+        'SELECT username, created_at FROM users WHERE id = ?',
         (user_id,)
     ).fetchone()
     conn.close()
@@ -265,6 +274,46 @@ def get_profile():
     'username': user['username'],
     'created_at': user['created_at']
 }), 200
+
+@app.route('/api/notes/search', methods=['GET'])
+def search_note():
+    user_id = get_current_user()
+
+    if not user_id:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    query = request.args.get('q', '').strip()
+    if not query:
+        return jsonify({'error': 'Search query required'}), 400
+    
+    conn = get_db()
+    notes = conn.execute(
+        'SELECT id, title, content, created_at FROM notes WHERE user_id = ? AND (title LIKE ? OR content LIKE ?) ORDER BY created_at DESC;',
+        (user_id, f'%{query}%', f'%{query}%')
+    ).fetchall()
+    conn.close()
+    
+    return jsonify([dict(n) for n in notes])
+
+def check_password_breach(password):
+    #Check if passwords appeared in data breaches using anonymity
+    sha1 = sha1 = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
+    prefix, suffix = sha1[:5], sha1[5:]
+    
+    try:
+        res = http_requests.get(
+            f'https://api.pwnedpasswords.com/range/{prefix}', timeout=3
+        )
+        
+        for line in res.text.splitlines():
+            hash_suffix, count = line.split(':')
+            if hash_suffix == suffix:
+                return int(count)
+    
+    except http_requests.RequestException:
+        pass #fail open if API is down
+    
+    return 0
 
 # =========================
 # Start

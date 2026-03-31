@@ -1123,10 +1123,10 @@ if breach_count > 0:
 4. **Document your API** in a markdown file — each endpoint, method, headers, body, and responses.
 
 ### Checkpoint
-- [ ] You can test all endpoints using REST Client
-- [ ] You understand HTTP status codes (200, 201, 400, 401, 404, 409, 429)
-- [ ] You've integrated HaveIBeenPwned and understand k-anonymity
-- [ ] You know the difference between client-side and server-side validation
+- [x] You can test all endpoints using REST Client
+- [x] You understand HTTP status codes (200, 201, 400, 401, 404, 409, 429)
+- [x] You've integrated HaveIBeenPwned and understand k-anonymity
+- [x] You know the difference between client-side and server-side validation
 
 ---
 

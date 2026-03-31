@@ -14,4 +14,54 @@ Content-Type: application/json
 POST http://localhost:5000/api/register
 Content-Type: application/json
 
-{ "username": "baduser", "password": "123"}
+{ "username": "baduser", "password": "123" }
+
+### Login
+POST http://localhost:5000/api/login
+Content-Type: application/json
+
+{ "username": "testuser", "password": "securepass123" }
+
+### Login with wrong password
+POST http://localhost:5000/api/login
+Content-Type: application/json
+
+{ "username": "testuser", "password": "wrongpassword" }
+
+### Create note with XSS payload
+POST http://localhost:5000/api/notes
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJleHAiOjE3NzQ5NDIwNzB9.-yNs-W6Y9dla2Wo0_d0tPqpFWAeBIR1ujUUQupnLNYk
+
+{ "title": "<script>alert('xss')</script>", "content": "<img src=x onerror=alert('stored xss')>" }
+
+### Create a note
+POST http://localhost:5000/api/notes
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJleHAiOjE3NzQ5NDIwNzB9.-yNs-W6Y9dla2Wo0_d0tPqpFWAeBIR1ujUUQupnLNYk
+
+{ "title": "My first note", "content": "Hello world from the API!"}
+
+###Get all notes
+GET http://localhost:5000/api/notes
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJleHAiOjE3NzQ5NDQ0OTN9.w3YDHTpdGZz0qbP5QhspSUPNmaJzGXHsYMBjiZwV3Qo
+
+### Get notes without token (should fail 401)
+GET http://localhost:5000/api/notes
+
+### Delete a note
+DELETE http://localhost:5000/api/notes/5
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJleHAiOjE3NzQ5NDIwNzB9.-yNs-W6Y9dla2Wo0_d0tPqpFWAeBIR1ujUUQupnLNYk
+
+
+### Update a Note
+PUT http://localhost:5000/api/notes/6
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJleHAiOjE3NzQ5NDUwMjV9.iVgKpouXX08rlDUTt8Wlbc9nT6Fu6-u2umncVc2USz4
+
+{ "title": "Edited note", "content": "I edited this note using a put request" }
+
+### Get note with a keyword
+GET http://localhost:5000/api/notes/search?q=edited
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJleHAiOjE3NzQ5NDYyNzB9.KuR0nBjV2WL-nMKfcMdMKt9KGsG6QwwRMi3DO4AuvtQ
