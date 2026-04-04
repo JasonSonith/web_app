@@ -1139,8 +1139,8 @@ Switch from developer to attacker. Systematically test for the OWASP Top 10 agai
 ```bash
 sqlmap -u "http://localhost:5000/api/login" \
     --data='{"username":"test","password":"test"}' \
-    --content-type="application/json" \
-    --method=POST --level=3
+    --headers="Content-Type: application/json" \
+    --method=POST --level=3 --ignore-code=401
 # Expected: "all tested parameters do not appear to be injectable"
 ```
 
