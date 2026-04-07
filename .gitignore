@@ -1,2 +1,6 @@
 test_folder/
 venv/
+cert.pem
+key.pem
+*.log
+securenotes.db

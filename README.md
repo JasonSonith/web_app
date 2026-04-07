@@ -1,194 +1,80 @@
 # SecureNotes
 
-A full-stack note-taking web application I built from scratch to gain hands-on experience with web development and security testing. This project serves as a proof of concept for building secure web applications and conducting basic penetration testing against my own code.
+A simple note-taking app I built as a hands-on intro to web security and pentesting. Nothing fancy — the goal was to have something real to attack, not to build a production app.
 
-## Purpose
+## What this is
 
-This project demonstrates:
-- Building a complete web application from frontend to database
-- Implementing authentication and authorization securely
-- Identifying and mitigating common web vulnerabilities (OWASP Top 10)
-- Using security testing tools against my own application
+I wanted to learn pentesting by doing it against code I wrote myself. So I built a basic full-stack app from scratch, then ran tools like sqlmap, Nikto, and Burp Suite against it to see what they caught. The app covers enough ground to test the OWASP Top 10 without being so complex it gets in the way.
 
-## Features
+## Stack
 
-- User registration and login with secure password hashing
-- JWT-based authentication
-- Create, view, and delete personal notes
-- Modern responsive UI
-- Security protections against SQL injection, XSS, IDOR, and brute force attacks
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|------------|
-| Frontend | HTML5, CSS3, JavaScript |
+| Layer | Tech |
+|-------|------|
+| Frontend | HTML, CSS, vanilla JS |
 | Backend | Python 3, Flask |
 | Database | SQLite |
 | Auth | bcrypt, PyJWT |
 
-## Quick Start
+## Features
 
-### Prerequisites
+- User registration and login
+- JWT authentication (stored in memory, not localStorage)
+- Create, view, and delete notes
+- Rate limiting on auth endpoints
+- Basic security headers
 
-- Python 3.8+
-- pip
-
-### Installation
+## Running it
 
 ```bash
-# Clone the repository
-git clone <repo-url>
-cd web_app
-
-# Create and activate virtual environment
 python3 -m venv venv
-source venv/bin/activate  # Linux/Mac
-# or: venv\Scripts\activate  # Windows
-
-# Install dependencies
+source venv/bin/activate
 pip install flask flask-limiter bcrypt pyjwt requests
-```
 
-### Running the Application
-
-```bash
 python3 src/app.py
 ```
 
-Open http://localhost:5000 in your browser.
+The server starts on `https://localhost:5000` (self-signed cert — you'll need to accept the browser warning or use `curl -k`).
 
-## Project Structure
+## API
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | /api/register | No | Create account |
+| POST | /api/login | No | Get JWT token |
+| GET | /api/notes | Yes | List notes |
+| POST | /api/notes | Yes | Create note |
+| DELETE | /api/notes/:id | Yes | Delete note |
+
+All protected routes expect `Authorization: Bearer <token>`.
+
+## Security testing
+
+```bash
+# SQL injection
+sqlmap -u "https://localhost:5000/api/login" \
+    --data='{"username":"test","password":"test"}' \
+    --content-type="application/json"
+
+# General scan
+nikto -h https://localhost:5000
+```
+
+## Project structure
 
 ```
 web_app/
 ├── src/
-│   ├── app.py              # Flask backend with API routes
+│   ├── app.py
 │   └── static/
-│       ├── index.html      # Main HTML page
-│       ├── style.css       # Styles
-│       └── app.js          # Frontend logic
+│       ├── index.html
+│       ├── style.css
+│       └── app.js
 ├── test/
-│   └── test_api.http       # API test requests
-├── system-design/          # Architecture & flow diagrams
-│   ├── sercure-notes-architecture.svg
-│   ├── data-model.svg
-│   ├── login-flow.svg
-│   ├── registration.svg
-│   ├── auth-request.png
-│   └── token lifecycle.png
-├── docs/                   # Documentation
-├── CLAUDE.md               # Development instructions
-└── README.md
-```
-
-## System Design
-
-Diagrams are in the [`system-design/`](system-design/) directory.
-
-### Architecture
-
-Three-tier design: **Client** (HTML/CSS/JS) → **Server** (Flask/Python) → **Database** (SQLite).
-
-The client serves static files through Flask. The server layer handles routing, input validation, JWT auth middleware, bcrypt password hashing, rate limiting, and security headers. All data is stored in `securenotes.db`.
-
-### Data Model
-
-| users | | notes |
-|-------|---|-------|
-| **PK** id (INT) | 1:N | **PK** id (INT) |
-| username (UNIQUE) | → | user_id (FK → users) |
-| password_hash (NOT NULL) | | title (TEXT) |
-| created_at (TIMESTAMP) | | content (TEXT) |
-| | | created_at (TIMESTAMP) |
-
-### Authentication Flows
-
-**Registration:** Client sends username/password → server validates input → checks password against HIBP breach API → hashes with bcrypt → inserts into users table → responds `201 Created` or `409/400` error.
-
-**Login:** Client sends username/password → server looks up user by username → verifies password with `bcrypt.checkpw()` → generates JWT with `jwt.encode()` → responds `200` with token or `401` error.
-
-**Authenticated requests:** Client sends request with `Authorization: Bearer <token>` → server decodes JWT, validates signature and expiry → extracts `user_id` → queries only that user's data → responds with results.
-
-### Token Lifecycle
-
-1. Issued on login with 2-hour expiration
-2. Stored in a JS variable (memory only — not localStorage or cookies)
-3. Sent as Bearer token on every API request
-4. Server validates signature + expiry on each request
-5. Tampered or expired tokens receive `401`
-
-## API Reference
-
-### Authentication
-
-#### Register
-```http
-POST /api/register
-Content-Type: application/json
-
-{"username": "newuser", "password": "securepass123"}
-```
-
-#### Login
-```http
-POST /api/login
-Content-Type: application/json
-
-{"username": "newuser", "password": "securepass123"}
-```
-Returns: `{"token": "eyJ..."}`
-
-### Notes
-
-All notes endpoints require `Authorization: Bearer <token>` header.
-
-#### List Notes
-```http
-GET /api/notes
-```
-
-#### Create Note
-```http
-POST /api/notes
-Content-Type: application/json
-
-{"title": "My Note", "content": "Note content here"}
-```
-
-#### Delete Note
-```http
-DELETE /api/notes/:id
-```
-
-## Security Features
-
-| Protection | Implementation |
-|------------|----------------|
-| SQL Injection | Parameterized queries |
-| XSS | textContent for rendering, CSP headers |
-| Password Storage | bcrypt hashing |
-| Auth | JWT with expiration |
-| Brute Force | Rate limiting on auth endpoints |
-| IDOR | User ownership checks on all operations |
-| Clickjacking | X-Frame-Options: DENY |
-
-## Security Testing
-
-Test the application with common security tools:
-
-```bash
-# SQL Injection scan
-sqlmap -u "http://localhost:5000/api/login" \
-    --data='{"username":"test","password":"test"}' \
-    --content-type="application/json"
-
-# Web vulnerability scan
-nikto -h http://localhost:5000
-
-# Or use OWASP ZAP for comprehensive testing
+│   └── test_api.http
+├── system-design/
+└── docs/
 ```
 
 ## About
 
-This is a personal learning project. The application intentionally starts with basic implementations that are then hardened through security testing, demonstrating both vulnerable patterns and their fixes.
+This is a learning project. I built it to get comfortable with web app internals before trying to break them. It's not meant to be deployed anywhere.

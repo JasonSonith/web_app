@@ -1,11 +1,15 @@
 from flask import Flask, request, jsonify, send_from_directory
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import sqlite3
 import bcrypt
 import jwt
 import datetime
+import logging
 import os
 import re
 import hashlib
+import html
 import requests as http_requests
 
 app = Flask(__name__, static_folder='static')
@@ -125,6 +129,8 @@ def register():
     finally:
         conn.close()
 
+
+limiter = Limiter(get_remote_address, app=app, default_limits=["200 per hour"], storage_uri = "memory://")
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -135,6 +141,7 @@ def login():
     password = data.get('password', '')
 
     if not username or not password:
+        logging.warning(f'Failed login attempt for "{username}" from {request.remote_addr}')
         return jsonify({'error': 'Username and password required'}), 400
 
     conn = get_db()
@@ -186,8 +193,8 @@ def create_note():
     if not data:
         return jsonify({'error': 'Invalid request body'}), 400
 
-    title = data.get('title', '').strip()
-    content = data.get('content', '').strip()
+    title = html.escape(data.get('title', '').strip())
+    content = html.escape(data.get('content', '').strip())
 
     if not title or not content:
         return jsonify({'error': 'Title and content are required'}), 400
@@ -316,9 +323,26 @@ def check_password_breach(password):
     return 0
 
 # =========================
+# Request Handling
+# =========================
+@app.after_request
+def add_security_headers(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self'; style-src 'self'"
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    response.headers['Permission-Policy'] = 'camera=(), microphone=(), geolocation=()'
+    return response
+
+logging.basicConfig(filename='securenotes.log', level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
+@app.before_request
+def log_request():
+    logging.info(f'{request.remote_addr} {request.method} {request.path}')
+
+# =========================
 # Start
 # =========================
 if __name__ == '__main__':
     init_db()
     print('Server running at http://localhost:5000')
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('cert.pem', 'key.pem'))
